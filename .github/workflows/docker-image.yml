@@ -15,11 +15,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: docker/login-action@v1.10.0
-      with:
-        username: flohsg
-        password: ${{ secrets.DOCKER_DEPLOY_KEY }}
-        logout: true
     - uses: actions/checkout@v2
+    - name: docker login
+      env: 
+        ddk: ${{secrets.DOCKER_DEPLOY_KEY}}
+      run: echo $ddk | docker login -u flohsg --password-stdin
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag nginx_proxy_http:$(date +%s) -t nginx_proxy_http:latest && docker push nginx_proxy_http
+      run: docker build . --file Dockerfile --tag nginx_proxy_http:$(date +%s) -t nginx_proxy_http:latest && 
+    - name: docker push
+      run: docker push nginx_proxy_http
+    - name: docker logout
+      run: docker logout
